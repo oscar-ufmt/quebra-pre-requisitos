@@ -271,5 +271,23 @@
     "codigo": "114200344",
     "nome": "Teoria da Computação",
     "carga_horaria": "64h"
-  }
+  },
+  {
+    "codigo": "114200400",
+    "nome": "Trabalho de Conclusão de Curso I",
+    "carga_horaria": "16h",
+    "prerequisitos": ["114200399","114200306"]
+  },
+  {
+    "codigo": "114200401",
+    "nome": "Trabalho de Conclusão de Curso II",
+    "carga_horaria": "16h",
+    "prerequisitos": ["114200400"]
+  },
+  {
+  "codigo": "114200404",
+  "nome": " Estágio Curricular Supervisionado",
+  "carga_horaria": "160h",
+  "prerequisitos": ["114200314","114300017"]
+}
 ]
