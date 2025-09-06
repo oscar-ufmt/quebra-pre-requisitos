@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solicitação de Quebra de Pré-requisito</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <h2>Solicitação de Quebra de Pré-requisito</h2>
+
+  <div id="disciplinas">
+    <div class="disciplina">
+      <label>Disciplina a ser quebrada:
+        <select class="disciplina-quebrada">
+          <option value="">Selecione</option>
+          <option value="CalculoII">Cálculo II</option>
+          <option value="CircuitosII">Circuitos II</option>
+          <option value="EstruturasDeDados">Estruturas de Dados</option>
+        </select>
+      </label>
+
+      <label>Disciplina pré-requisito:
+        <select class="disciplina-prereq">
+          <option value="">Selecione</option>
+          <option value="CalculoI">Cálculo I</option>
+          <option value="CircuitosI">Circuitos I</option>
+          <option value="ProgramacaoI">Programação I</option>
+        </select>
+      </label>
+
+      <label>Nota da disciplina pré-requisito:
+        <input type="text" class="nota-prereq" placeholder="Ex: 7.5" />
+      </label>
+
+      <label>Turma:
+        <input type="text" class="turma" placeholder="Ex: Turma A" />
+      </label>
+
+      <label>Horário:
+        <input type="text" class="horario" placeholder="Ex: 2ª e 4ª - 08h às 10h" />
+      </label>
+    </div>
+  </div>
+
+  <button onclick="addDisciplina()">Adicionar outra solicitação</button>
+  <button onclick="gerarPDF()">Gerar PDF</button>
+
+  <script src="script.js"></script>
+</body>
+</html>
