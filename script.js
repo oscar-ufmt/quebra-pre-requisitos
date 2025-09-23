@@ -49,6 +49,7 @@ function atualizarPrerequisitos(event) {
                 notaInput.type = "text";
                 notaInput.placeholder = "Nota";
                 notaInput.classList.add("nota-prereq");
+                notaInput.style.display = "none";
 
                 checkbox.addEventListener("change", () => {
                     notaInput.style.display = checkbox.checked ? "inline-block" : "none";
@@ -64,7 +65,6 @@ function atualizarPrerequisitos(event) {
     } else {
         container.textContent = "Nenhum pré-requisito";
     }
-
 }
 
 // Adiciona nova disciplina
@@ -72,8 +72,15 @@ function addDisciplina() {
     const container = document.getElementById("disciplinas");
     const nova = container.firstElementChild.cloneNode(true);
 
-    // Limpa todos os inputs e selects
-    nova.querySelectorAll("input").forEach(input => input.value = "");
+    // Limpa todos os inputs
+    nova.querySelectorAll("input").forEach(input => {
+        input.value = "";
+        if (input.classList.contains("turma")) {
+            input.placeholder = "Digite a turma"; // garante placeholder no clone
+        }
+    });
+
+    // Limpa todos os selects (só restou o disciplina-quebrada)
     nova.querySelectorAll("select").forEach(sel => sel.selectedIndex = 0);
 
     // Limpa os pré-requisitos do clone
@@ -84,7 +91,6 @@ function addDisciplina() {
 
     container.appendChild(nova);
 }
-
 
 // Gera PDF
 async function gerarPDF() {
