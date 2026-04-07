@@ -1,53 +1,5 @@
 [
-  {
-    "codigo": "114300071",
-    "nome": "Algoritmos e Estruturas de Dados I",
-    "carga_horaria": "64h",
-    "prerequisitos": []
-  },
-  {
-    "codigo": "114300004",
-    "nome": "Cálculo I ",
-    "carga_horaria": "96h",
-    "prerequisitos": []
-  },
-  {
-    "codigo": "114200305",
-    "nome": "Ciência, Tecnologia e Sociedade (EAD)",
-    "carga_horaria": "32h",
-    "prerequisitos": []
-  },
-  {
-    "codigo": "114200306",
-    "nome": "Escrita Científica",
-    "carga_horaria": "64h",
-    "prerequisitos": []
-  },
-  {
-    "codigo": "114100014",
-    "nome": "Química Geral",
-    "carga_horaria": "32h",
-    "prerequisitos": []
-  },
-  {
-    "codigo": "114100015",
-    "nome": "Química Geral Experimental",
-    "carga_horaria": "32h",
-    "prerequisitos": []
-  },
-  {
-    "codigo": "114200405",
-    "nome": "Sistemas Digitais",
-    "carga_horaria": "64h",
-    "prerequisitos": []
-  },
-  {
-    "codigo": "114300006",
-    "nome": "Álgebra Linear",
-    "carga_horaria": "64h",
-    "prerequisitos": ["114300004"]
-  },
-  {
+   {
     "codigo": "114300024",
     "nome": "Algoritmos e Estruturas de Dados II",
     "carga_horaria": "64h",
@@ -226,8 +178,8 @@
     "prerequisitos": ["114300017"]
   },
   {
-    "codigo": "114200340",
-    "nome": "Fenômenos de Transportes",
+    "codigo": "114100009",
+    "nome": "Fenômenos de Transporte",
     "carga_horaria": "64h",
     "prerequisitos": ["114300004"]
   },
@@ -250,7 +202,7 @@
     "prerequisitos": ["114200331"]
   },
   {
-    "codigo": "114300022",
+    "codigo": "114200397",
     "nome": "Automação Industrial",
     "carga_horaria": "64h",
     "prerequisitos": ["114300018"]
