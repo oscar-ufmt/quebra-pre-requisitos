@@ -8,44 +8,47 @@
 </head>
 <body>
 <h2>Solicitação de Quebra de Pré-requisito</h2>
-    
+
 <p style="background-color: #e9f7ef; padding: 10px; border-left: 5px solid #28a745; font-size: 0.95em;">
     <strong>Informações Importantes:</strong><br><br>
     • Disciplinas fora da FAENG devem ser solicitadas por meio do Protocolo Virtual do Aluno, durante o período de ajuste do coordenador, desde que o discente possua os pré-requisitos.<br>
     • Para turmas de outros cursos da FAENG, a disponibilidade de vagas estará sujeita à autorização do coordenador da disciplina.<br>
     • A matrícula será realizada após o período de ajuste do coordenador. <br>
     • As solicitações de quebra de pré-requisito não geram matrícula automática, estando sujeitas à disponibilidade de vagas e à classificação pelo coeficiente de rendimento.<br>
-    • Disciplinas do primeiro semestre não possuem pré-requisitos e, portanto, não podem ser solicitadas. Essas disciplinas são destinadas exclusivamente aos alunos ingressantes no curso.
+    • Disciplinas do primeiro semestre não possuem pré-requisitos e, portanto, não podem ser solicitadas. Essas disciplinas são destinadas exclusivamente aos alunos ingressantes no curso.<br><br>
+
+    <strong>ATENÇÃO:</strong><br>
+    • <strong>MARQUE APENAS</strong> os pré-requisitos que você <strong>JÁ CURSOU</strong>.<br>
+    • <strong>SE NÃO CURSOU, NÃO MARQUE</strong> a disciplina.<br>
+    • Para cada disciplina marcada, informe a nota <strong>EXATAMENTE como consta no seu histórico escolar</strong>.<br>
 </p>
 
 <div id="disciplinas">
 <p style="background-color: #fff3cd; padding: 10px; border-left: 5px solid #ffc107; font-size: 0.95em;">
-    <strong>Aviso:</strong> Caso a disciplina pretendida possua mais de um pré-requisito, o discente deverá selecionar todos os pré-requisitos correspondentes. 
+    <strong>Aviso:</strong> Caso a disciplina pretendida possua mais de um pré-requisito, o discente deverá selecionar todos os pré-requisitos correspondentes.
     Para aqueles que ainda não foram cursados, deixe o campo de nota em branco.
 </p>
 
-<div id="disciplinas">
-    <div class="disciplina">
-        <label>Disciplina a ser quebrada:
-            <select class="disciplina-quebrada">
-                <option value="">Selecione</option>
-            </select>
-        </label>
+    <div id="disciplinas-container">
 
-        <div class="prereq-container">
-            <!-- Aqui será adicionado dinamicamente os checkboxes e inputs -->
+        <div class="disciplina">
+            <label>Disciplina:
+                <select class="disciplina-quebrada">
+                    <option value="">Selecione</option>
+                </select>
+            </label>
+
+            <div class="prereq-container"></div>
+
+            <label>Turma:</label>
+            <input type="text" class="turma" placeholder="Ex: VE1" />
         </div>
 
-        <label for="turma">Turma desejada:</label>
-        <input type="text" id="turma" class="turma" placeholder="Ex: VE1" />
-        
-        <p style="font-size: 0.9em; color: #555; margin-top: 4px;">
-            <strong>Legenda:</strong> VE = Eng. Comp. | VC = Eng. Aut. | VQ = Eng. Quím. | VT = Eng. Transp. | VM = Eng. Min.
-        </p>
     </div>
+
 </div>
 
-    
+
 <button onclick="addDisciplina()">Adicionar outra solicitação</button>
 <button onclick="gerarPDF()">Gerar PDF</button>
 

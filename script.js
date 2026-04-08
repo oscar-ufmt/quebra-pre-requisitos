@@ -25,14 +25,22 @@ async function carregarDisciplinasObrigatorias() {
 // Atualiza pré-requisitos com checkboxes + nota
 function atualizarPrerequisitos(event) {
     const codigo = event.target.value;
-    const disciplina = disciplinasData.find(d => d.codigo === codigo);
+
+    const disciplina = disciplinasData.find(d =>
+        String(d.codigo).trim() === String(codigo).trim()
+    );
 
     const container = event.target.closest(".disciplina").querySelector(".prereq-container");
     container.innerHTML = '';
 
     if (disciplina && Array.isArray(disciplina.prerequisitos) && disciplina.prerequisitos.length > 0) {
+
         disciplina.prerequisitos.forEach(cod => {
-            const prereq = disciplinasData.find(d => d.codigo === cod);
+
+            const prereq = disciplinasData.find(d =>
+                String(d.codigo).trim() === String(cod).trim()
+            );
+
             if (prereq) {
                 const wrapper = document.createElement("div");
                 wrapper.classList.add("prereq-item");
@@ -53,6 +61,7 @@ function atualizarPrerequisitos(event) {
 
                 checkbox.addEventListener("change", () => {
                     notaInput.style.display = checkbox.checked ? "inline-block" : "none";
+                    if (!checkbox.checked) notaInput.value = "";
                 });
 
                 wrapper.appendChild(checkbox);
@@ -62,6 +71,7 @@ function atualizarPrerequisitos(event) {
                 container.appendChild(wrapper);
             }
         });
+
     } else {
         container.textContent = "Nenhum pré-requisito";
     }
@@ -69,25 +79,29 @@ function atualizarPrerequisitos(event) {
 
 // Adiciona nova disciplina
 function addDisciplina() {
-    const container = document.getElementById("disciplinas");
-    const nova = container.firstElementChild.cloneNode(true);
 
-    // Limpa todos os inputs
+    const container = document.getElementById("disciplinas-container");
+
+    const original = document.querySelector(".disciplina");
+    const nova = original.cloneNode(true);
+
+    // limpar inputs
     nova.querySelectorAll("input").forEach(input => {
         input.value = "";
-        if (input.classList.contains("turma")) {
-            input.placeholder = "Digite a turma"; // garante placeholder no clone
+        if (input.classList.contains("nota-prereq")) {
+            input.style.display = "none";
         }
     });
 
-    // Limpa todos os selects (só restou o disciplina-quebrada)
+    // limpar select
     nova.querySelectorAll("select").forEach(sel => sel.selectedIndex = 0);
 
-    // Limpa os pré-requisitos do clone
+    // limpar prerequisitos
     nova.querySelector(".prereq-container").innerHTML = '';
 
-    // Reatribui o evento do select
-    nova.querySelector(".disciplina-quebrada").addEventListener("change", atualizarPrerequisitos);
+    // reativar evento
+    nova.querySelector(".disciplina-quebrada")
+        .addEventListener("change", atualizarPrerequisitos);
 
     container.appendChild(nova);
 }
@@ -105,6 +119,7 @@ async function gerarPDF() {
     y += lineHeight * 2;
 
     const disciplinas = document.querySelectorAll(".disciplina");
+
     disciplinas.forEach((d, idx) => {
         if (y + 40 > 280) {
             doc.addPage();
@@ -116,22 +131,36 @@ async function gerarPDF() {
         y += lineHeight;
 
         doc.setFont("helvetica", "normal");
+
         const disciplinaQuebrada = d.querySelector(".disciplina-quebrada").selectedOptions[0]?.text || "-";
         const turma = d.querySelector(".turma").value || "-";
+
         doc.text(`Disciplina a ser quebrada: ${disciplinaQuebrada}`, 10, y);
         y += lineHeight;
 
         const prereqItems = d.querySelectorAll(".prereq-item");
+
         if (prereqItems.length > 0) {
+
             prereqItems.forEach(item => {
+
                 const checkbox = item.querySelector(".prereq-checkbox");
-                const nota = item.querySelector(".nota-prereq").value || "-";
+                const notaInput = item.querySelector(".nota-prereq");
+                const label = item.querySelector("label").textContent;
+
+                let texto;
+
                 if (checkbox.checked) {
-                    const label = item.querySelector("label").textContent;
-                    doc.text(`Pré-requisito: ${label} | Nota: ${nota}`, 10, y);
-                    y += lineHeight;
+                    const nota = notaInput.value || "não informada";
+                    texto = `Pré-requisito: ${label} | Cursada (Nota: ${nota})`;
+                } else {
+                    texto = `Pré-requisito: ${label} | NÃO cursada`;
                 }
+
+                doc.text(texto, 10, y);
+                y += lineHeight;
             });
+
         } else {
             doc.text("Nenhum pré-requisito", 10, y);
             y += lineHeight;
