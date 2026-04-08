@@ -81,7 +81,7 @@ function atualizarPrerequisitos(event) {
 function addDisciplina() {
     const container = document.getElementById("disciplinas-container");
 
-    const original = document.querySelector(".disciplina"); // 👈 pega a certa
+    const original = document.querySelector("#disciplinas-container .disciplina");
     const nova = original.cloneNode(true);
 
     // limpar inputs
@@ -96,7 +96,10 @@ function addDisciplina() {
     nova.querySelector(".disciplina-quebrada").selectedIndex = 0;
 
     // limpar prerequisitos
-    nova.querySelector(".prereq-container").innerHTML = '';
+    nconst prereqContainer = nova.querySelector(".prereq-container");
+    if (prereqContainer) {
+        prereqContainer.innerHTML = '';
+    }
 
     // reativar evento
     nova.querySelector(".disciplina-quebrada")
