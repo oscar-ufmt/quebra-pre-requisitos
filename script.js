@@ -79,10 +79,9 @@ function atualizarPrerequisitos(event) {
 
 // Adiciona nova disciplina
 function addDisciplina() {
-
     const container = document.getElementById("disciplinas-container");
 
-    const original = document.querySelector(".disciplina");
+    const original = document.querySelector(".disciplina"); // 👈 pega a certa
     const nova = original.cloneNode(true);
 
     // limpar inputs
@@ -94,7 +93,7 @@ function addDisciplina() {
     });
 
     // limpar select
-    nova.querySelectorAll("select").forEach(sel => sel.selectedIndex = 0);
+    nova.querySelector(".disciplina-quebrada").selectedIndex = 0;
 
     // limpar prerequisitos
     nova.querySelector(".prereq-container").innerHTML = '';
@@ -105,7 +104,6 @@ function addDisciplina() {
 
     container.appendChild(nova);
 }
-
 // Gera PDF
 async function gerarPDF() {
     const { jsPDF } = window.jspdf;
