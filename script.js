@@ -1,28 +1,29 @@
 let disciplinasData = [];
 
-// Carrega disciplinas do JSON
+// =============================
+// CARREGAR JSON
+// =============================
 async function carregarDisciplinasObrigatorias() {
-    try {
-        const response = await fetch("disciplinas_obrigatorias.json");
-        disciplinasData = await response.json();
+    const response = await fetch("disciplinas_obrigatorias.json");
+    disciplinasData = await response.json();
 
-        document.querySelectorAll(".disciplina-quebrada").forEach(sel => {
-            sel.innerHTML = '<option value="">Selecione</option>';
-            disciplinasData.forEach(d => {
-                const opt = document.createElement("option");
-                opt.value = d.codigo;
-                opt.textContent = `${d.codigo} - ${d.nome}`;
-                sel.appendChild(opt);
-            });
+    document.querySelectorAll(".disciplina-quebrada").forEach(sel => {
+        sel.innerHTML = '<option value="">Selecione</option>';
 
-            sel.addEventListener("change", atualizarPrerequisitos);
+        disciplinasData.forEach(d => {
+            const opt = document.createElement("option");
+            opt.value = d.codigo;
+            opt.textContent = `${d.codigo} - ${d.nome}`;
+            sel.appendChild(opt);
         });
-    } catch (err) {
-        console.error("Erro ao carregar disciplinas:", err);
-    }
+
+        sel.addEventListener("change", atualizarPrerequisitos);
+    });
 }
 
-// Atualiza pré-requisitos com checkboxes + nota
+// =============================
+// PRÉ-REQUISITOS
+// =============================
 function atualizarPrerequisitos(event) {
     const codigo = event.target.value;
 
@@ -33,7 +34,7 @@ function atualizarPrerequisitos(event) {
     const container = event.target.closest(".disciplina").querySelector(".prereq-container");
     container.innerHTML = '';
 
-    if (disciplina && Array.isArray(disciplina.prerequisitos) && disciplina.prerequisitos.length > 0) {
+    if (disciplina && disciplina.prerequisitos?.length > 0) {
 
         disciplina.prerequisitos.forEach(cod => {
 
@@ -42,31 +43,28 @@ function atualizarPrerequisitos(event) {
             );
 
             if (prereq) {
+
                 const wrapper = document.createElement("div");
-                wrapper.classList.add("prereq-item");
 
                 const checkbox = document.createElement("input");
                 checkbox.type = "checkbox";
-                checkbox.classList.add("prereq-checkbox");
-                checkbox.value = prereq.codigo;
 
                 const label = document.createElement("label");
                 label.textContent = `${prereq.codigo} - ${prereq.nome}`;
 
-                const notaInput = document.createElement("input");
-                notaInput.type = "text";
-                notaInput.placeholder = "Nota";
-                notaInput.classList.add("nota-prereq");
-                notaInput.style.display = "none";
+                const nota = document.createElement("input");
+                nota.type = "text";
+                nota.placeholder = "Nota";
+                nota.style.display = "none";
 
                 checkbox.addEventListener("change", () => {
-                    notaInput.style.display = checkbox.checked ? "inline-block" : "none";
-                    if (!checkbox.checked) notaInput.value = "";
+                    nota.style.display = checkbox.checked ? "inline-block" : "none";
+                    if (!checkbox.checked) nota.value = "";
                 });
 
                 wrapper.appendChild(checkbox);
                 wrapper.appendChild(label);
-                wrapper.appendChild(notaInput);
+                wrapper.appendChild(nota);
 
                 container.appendChild(wrapper);
             }
@@ -77,102 +75,69 @@ function atualizarPrerequisitos(event) {
     }
 }
 
-// Adiciona nova disciplina
+// =============================
+// ADD DISCIPLINA
+// =============================
 function addDisciplina() {
     const container = document.getElementById("disciplinas-container");
 
     const original = document.querySelector("#disciplinas-container .disciplina");
     const nova = original.cloneNode(true);
 
-    // limpar inputs
     nova.querySelectorAll("input").forEach(input => {
         input.value = "";
-        if (input.classList.contains("nota-prereq")) {
-            input.style.display = "none";
-        }
+        if (input.type === "text") input.style.display = "";
     });
 
-    // limpar select
     nova.querySelector(".disciplina-quebrada").selectedIndex = 0;
 
-    // limpar prerequisitos
-    nconst prereqContainer = nova.querySelector(".prereq-container");
-    if (prereqContainer) {
-        prereqContainer.innerHTML = '';
-    }
+    const prereqContainer = nova.querySelector(".prereq-container");
+    if (prereqContainer) prereqContainer.innerHTML = '';
 
-    // reativar evento
     nova.querySelector(".disciplina-quebrada")
         .addEventListener("change", atualizarPrerequisitos);
 
     container.appendChild(nova);
 }
-// Gera PDF
-async function gerarPDF() {
+
+// =============================
+// PDF
+// =============================
+function gerarPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     let y = 15;
-    const lineHeight = 7;
 
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text("Solicitação de Quebra de Pré-requisito", 105, y, { align: "center" });
-    y += lineHeight * 2;
+    document.querySelectorAll(".disciplina").forEach((d, i) => {
 
-    const disciplinas = document.querySelectorAll(".disciplina");
-
-    disciplinas.forEach((d, idx) => {
-        if (y + 40 > 280) {
-            doc.addPage();
-            y = 15;
-        }
-
-        doc.setFont("helvetica", "bold");
-        doc.text(`Solicitação ${idx + 1}:`, 10, y);
-        y += lineHeight;
-
-        doc.setFont("helvetica", "normal");
-
-        const disciplinaQuebrada = d.querySelector(".disciplina-quebrada").selectedOptions[0]?.text || "-";
+        const nome = d.querySelector(".disciplina-quebrada").selectedOptions[0]?.text || "-";
         const turma = d.querySelector(".turma").value || "-";
 
-        doc.text(`Disciplina a ser quebrada: ${disciplinaQuebrada}`, 10, y);
-        y += lineHeight;
+        doc.text(`Solicitação ${i+1}`, 10, y); y+=6;
+        doc.text(`Disciplina: ${nome}`, 10, y); y+=6;
 
-        const prereqItems = d.querySelectorAll(".prereq-item");
+        d.querySelectorAll(".prereq-item, div").forEach(pr => {
 
-        if (prereqItems.length > 0) {
+            const chk = pr.querySelector("input[type=checkbox]");
+            const nota = pr.querySelector("input[type=text]");
+            const label = pr.querySelector("label");
 
-            prereqItems.forEach(item => {
-
-                const checkbox = item.querySelector(".prereq-checkbox");
-                const notaInput = item.querySelector(".nota-prereq");
-                const label = item.querySelector("label").textContent;
-
-                let texto;
-
-                if (checkbox.checked) {
-                    const nota = notaInput.value || "não informada";
-                    texto = `Pré-requisito: ${label} | Cursada (Nota: ${nota})`;
-                } else {
-                    texto = `Pré-requisito: ${label} | NÃO cursada`;
-                }
+            if (chk && label) {
+                let texto = chk.checked
+                    ? `${label.textContent} - Cursada (${nota?.value || "-"})`
+                    : `${label.textContent} - NÃO cursada`;
 
                 doc.text(texto, 10, y);
-                y += lineHeight;
-            });
-
-        } else {
-            doc.text("Nenhum pré-requisito", 10, y);
-            y += lineHeight;
-        }
+                y+=6;
+            }
+        });
 
         doc.text(`Turma: ${turma}`, 10, y);
-        y += lineHeight * 2;
+        y+=10;
     });
 
-    doc.save("quebra_pre_requisito.pdf");
+    doc.save("arquivo.pdf");
 }
 
-// Inicializa
+// =============================
 window.addEventListener("DOMContentLoaded", carregarDisciplinasObrigatorias);
