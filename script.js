@@ -1,199 +1,149 @@
 let disciplinasData = [];
 
-// =============================
-// CARREGAR JSON
-// =============================
-async function carregarDisciplinasObrigatorias() {
-    const response = await fetch("disciplinas_obrigatorias.json");
-    disciplinasData = await response.json();
-
-    document.querySelectorAll(".disciplina-quebrada").forEach(sel => {
-        sel.innerHTML = '<option value="">Selecione</option>';
-
-        disciplinasData.forEach(d => {
-            const opt = document.createElement("option");
-            opt.value = d.codigo;
-            opt.textContent = `${d.codigo} - ${d.nome}`;
-            sel.appendChild(opt);
-        });
-
-        sel.addEventListener("change", atualizarPrerequisitos);
-    });
-}
-
-// =============================
-// PRÉ-REQUISITOS
-// =============================
-function atualizarPrerequisitos(event) {
-
-    const codigo = event.target.value;
-
-    const disciplina = disciplinasData.find(d =>
-        String(d.codigo).trim() === String(codigo).trim()
-    );
-
-    const container = event.target.closest(".disciplina").querySelector(".prereq-container");
-    container.innerHTML = '';
-
-    if (disciplina && disciplina.prerequisitos?.length > 0) {
-
-        // 🔹 título
-        const titulo = document.createElement("p");
-        titulo.innerHTML = "<strong>Lista de pré-requisitos:</strong>";
-        container.appendChild(titulo);
-
-        disciplina.prerequisitos.forEach(cod => {
-            const prereq = disciplinasData.find(d =>
-                String(d.codigo).trim() === String(cod).trim()
-            );
-
-            if (!prereq) return;
-
-            const div = document.createElement("div");
-            div.classList.add("prereq-item");
-
-            const checkbox = document.createElement("input");
-            checkbox.type = "checkbox";
-
-            const label = document.createElement("label");
-            label.textContent = `${prereq.codigo} - ${prereq.nome}`;
-
-            const nota = document.createElement("input");
-            nota.type = "text";
-            nota.placeholder = "Nota";
-            nota.style.display = "none";
-
-            checkbox.addEventListener("change", () => {
-                nota.style.display = checkbox.checked ? "inline-block" : "none";
-                if (!checkbox.checked) nota.value = "";
-            });
-
-            div.appendChild(checkbox);
-            div.appendChild(label);
-            div.appendChild(nota);
-
-            container.appendChild(div);
-        });
-
-    } else {
-        container.textContent = "Nenhum pré-requisito";
+async function carregarDados() {
+    try {
+        const response = await fetch("disciplinas_obrigatorias.json");
+        disciplinasData = await response.json();
+        carregarInfoAdicional();
+        addDisciplina();
+    } catch (e) {
+        console.error("Erro ao carregar JSON", e);
     }
 }
 
-// =============================
-// ADD DISCIPLINA
-// =============================
-function addDisciplina() {
-
-    const container = document.getElementById("disciplinas-container");
-
-    const original = document.querySelector("#disciplinas-container .disciplina");
-    const nova = original.cloneNode(true);
-
-    // limpar inputs
-    nova.querySelectorAll("input").forEach(input => {
-        input.value = "";
-        input.style.display = "";
-    });
-
-    // reset select
-    nova.querySelector(".disciplina-quebrada").selectedIndex = 0;
-
-    // limpar prerequisitos
-    const prereqContainer = nova.querySelector(".prereq-container");
-    if (prereqContainer) prereqContainer.innerHTML = '';
-
-    // reativar evento
-    nova.querySelector(".disciplina-quebrada")
-        .addEventListener("change", atualizarPrerequisitos);
-
-    container.appendChild(nova);
+function salvarInfoAdicional() {
+    const sei = document.getElementById('alunoSEI').value;
+    localStorage.setItem('sei_quebra_ufmt', sei);
 }
 
-// =============================
-// PDF
-// =============================
-function gerarPDF() {
+function carregarInfoAdicional() {
+    const savedSei = localStorage.getItem('sei_quebra_ufmt');
+    if (savedSei) document.getElementById('alunoSEI').value = savedSei;
+}
 
+function limparFormulario() {
+    if(confirm("Deseja limpar todos os campos?")) {
+        localStorage.removeItem('sei_quebra_ufmt');
+        window.location.reload();
+    }
+}
+
+function addDisciplina() {
+    const container = document.getElementById("disciplinas-container");
+    const id = Date.now();
+    const div = document.createElement("div");
+    div.className = "card disciplina-block";
+    div.id = `block-${id}`;
+
+    div.innerHTML = `
+        <div class="card-header">
+            <h4>Solicitação</h4>
+            <button onclick="removerBloco('${id}')" class="btn-remove">Excluir</button>
+        </div>
+        
+        <div class="form-group">
+            <label>Disciplina a ser quebrada:</label>
+            <select class="select-disciplina" onchange="atualizarPrerequisitos(this, '${id}')">
+                <option value="">Selecione...</option>
+                ${disciplinasData.map(d => `<option value="${d.codigo}">${d.codigo} - ${d.nome}</option>`).join('')}
+            </select>
+        </div>
+
+        <div id="prereq-area-${id}" class="prereq-list-container"></div>
+
+        <div class="form-group">
+            <label>Turma:</label>
+            <input type="text" class="input-turma" placeholder="Ex: VE1">
+        </div>
+    `;
+    container.appendChild(div);
+}
+
+function removerBloco(id) {
+    const blocks = document.querySelectorAll('.disciplina-block');
+    if (blocks.length > 1) document.getElementById(`block-${id}`).remove();
+}
+
+function atualizarPrerequisitos(select, id) {
+    const codigo = select.value;
+    const container = document.getElementById(`prereq-area-${id}`);
+    container.innerHTML = '';
+    const disciplina = disciplinasData.find(d => String(d.codigo) === String(codigo));
+
+    if (disciplina && disciplina.prerequisitos?.length > 0) {
+        const subheader = document.createElement("div");
+        subheader.className = "prereq-header-row";
+        subheader.innerHTML = "<span>Pré-requisito</span><span>Nota</span>";
+        container.appendChild(subheader);
+
+        disciplina.prerequisitos.forEach(codPre => {
+            const preObj = disciplinasData.find(d => String(d.codigo) === String(codPre));
+            if (!preObj) return;
+
+            const item = document.createElement("div");
+            item.className = "prereq-row";
+            item.innerHTML = `
+                <div class="left-side">
+                    <input type="checkbox" id="chk-${id}-${codPre}" onchange="toggleNota(this)">
+                    <label for="chk-${id}-${codPre}">${preObj.codigo} - ${preObj.nome}</label>
+                </div>
+                <div class="right-side">
+                    <input type="text" class="input-nota" placeholder="0,00" style="visibility:hidden">
+                </div>
+            `;
+            container.appendChild(item);
+        });
+    }
+}
+
+function toggleNota(checkbox) {
+    const notaInput = checkbox.closest('.prereq-row').querySelector('.input-nota');
+    notaInput.style.visibility = checkbox.checked ? "visible" : "hidden";
+}
+
+function gerarPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
+    const sei = document.getElementById('alunoSEI').value || "Não informado";
 
-    let y = 15;
+    let y = 20;
+    doc.setFontSize(14); doc.setFont("helvetica", "bold");
+    doc.text("UNIVERSIDADE FEDERAL DE MATO GROSSO", 105, y, { align: "center" });
+    y += 10;
+    doc.setFontSize(12);
+    doc.text("REQUERIMENTO DE QUEBRA DE PRÉ-REQUISITO", 105, y, { align: "center" });
+    y += 15;
 
-    document.querySelectorAll(".disciplina").forEach((d, i) => {
+    doc.setFontSize(10); doc.setFont("helvetica", "bold");
+    doc.text(`Processo SEI: ${sei}`, 15, y);
+    y += 10;
+    doc.line(15, y, 195, y);
+    y += 10;
 
-        const nome = d.querySelector(".disciplina-quebrada").selectedOptions[0]?.text || "-";
-        const turma = d.querySelector(".turma").value || "-";
+    document.querySelectorAll(".disciplina-block").forEach((bloco, index) => {
+        const discSelect = bloco.querySelector(".select-disciplina");
+        if (discSelect.value === "") return;
+        const discNome = discSelect.options[discSelect.selectedIndex].text;
+        const turma = bloco.querySelector(".input-turma").value || "Não informada";
 
-        // 🔹 título menor e em negrito
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(11);
-        doc.text(`Solicitação ${i + 1}`, 10, y);
-        y += 6;
-
-        // 🔹 texto normal menor
+        doc.text(`${index + 1}. DISCIPLINA: ${discNome} (Turma: ${turma})`, 15, y);
+        y += 7;
         doc.setFont("helvetica", "normal");
-        doc.setFontSize(10);
 
-        doc.text(`Disciplina: ${nome}`, 10, y);
-        y += 6;
+        bloco.querySelectorAll(".prereq-row").forEach(row => {
+            const chk = row.querySelector("input[type=checkbox]");
+            const label = row.querySelector("label").textContent;
+            const nota = row.querySelector(".input-nota").value || "0,00";
 
-        const prereqs = d.querySelectorAll(".prereq-item");
-
-        if (prereqs.length === 0) {
-            doc.text("Nenhum pré-requisito", 10, y);
+            const status = chk.checked ? `Cursada (Nota: ${nota})` : "NÃO cursada";
+            doc.text(`   - ${label}: ${status}`, 20, y);
             y += 6;
-        }
-
-        prereqs.forEach(pr => {
-
-            const chk = pr.querySelector("input[type=checkbox]");
-            const notaInput = pr.querySelector("input[type=text]");
-            const label = pr.querySelector("label");
-
-            if (chk && label) {
-
-                let texto;
-
-                if (chk.checked) {
-
-                    let nota = notaInput?.value || "";
-
-                    // 🔹 formatação 3 → 3,00
-                    if (nota !== "") {
-                        nota = parseFloat(nota.replace(",", "."));
-                        if (!isNaN(nota)) {
-                            nota = nota.toFixed(2).replace(".", ",");
-                        } else {
-                            nota = "-";
-                        }
-                    } else {
-                        nota = "-";
-                    }
-
-                    texto = `${label.textContent} - Cursada (${nota})`;
-
-                } else {
-                    texto = `${label.textContent} - NÃO cursada`;
-                }
-
-                doc.text(texto, 10, y);
-                y += 6;
-            }
         });
-
-        doc.text(`Turma: ${turma}`, 10, y);
-        y += 10;
+        y += 4;
     });
 
-    doc.save("arquivo.pdf");
+    doc.save(`Requerimento_Quebra_SEI_${sei.replace(/\//g, '-')}.pdf`);
 }
 
-// =============================
-// INICIALIZAÇÃO
-// =============================
-window.addEventListener("DOMContentLoaded", carregarDisciplinasObrigatorias);
-
-// 🔥 IMPORTANTE (resolve teu erro)
-window.addDisciplina = addDisciplina;
-window.gerarPDF = gerarPDF;
+window.onload = carregarDados;

@@ -3,53 +3,63 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Solicitação de Quebra de Pré-requisito</title>
+    <title>UFMT | Requerimento de Quebra</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<h2>Solicitação de Quebra de Pré-requisito</h2>
 
-<p style="background-color: #e9f7ef; padding: 10px; border-left: 5px solid #28a745; font-size: 0.95em;">
-    <strong>Informações Importantes:</strong><br><br>
-    • Disciplinas fora da FAENG devem ser solicitadas por meio do Protocolo Virtual do Aluno, durante o período de ajuste do coordenador, desde que o discente possua os pré-requisitos.<br>
-    • Para turmas de outros cursos da FAENG, a disponibilidade de vagas estará sujeita à autorização do coordenador da disciplina.<br>
-    • A matrícula será realizada após o período de ajuste do coordenador. <br>
-    • As solicitações de quebra de pré-requisito não geram matrícula automática, estando sujeitas à disponibilidade de vagas e à classificação pelo coeficiente de rendimento.<br>
-    • Disciplinas do primeiro semestre não possuem pré-requisitos e não podem ser solicitadas.<br><br>
-
-    <strong>ATENÇÃO:</strong><br>
-    • <strong>MARQUE APENAS</strong> os pré-requisitos que você <strong>JÁ CURSOU</strong>.<br>
-    • <strong>SE NÃO CURSOU, NÃO MARQUE</strong>.<br>
-    • Informe a nota exatamente como está no histórico.<br>
-</p>
-
-<div id="disciplinas">
-    
-    <div id="disciplinas-container">
-
-        <div class="disciplina">
-            <label>Disciplina a ser quebrada (disciplina que você quer cursar SEM ter cumprido todos os pré-requisitos):
-                <select class="disciplina-quebrada">
-                    <option value="">Selecione</option>
-                </select>
-            </label>
-
-            <div class="prereq-container"></div>
-
-            <label>Turma:</label>
-            <input type="text" class="turma" placeholder="Ex: VE1" />
+<header class="main-header">
+    <div class="header-container">
+        <div class="brand">
+            <h1>UFMT</h1>
+            <span>Requerimento de Quebra de Pré-requisito</span>
         </div>
-
+        <div class="actions">
+            <button onclick="gerarPDF()" class="btn-pdf">📄 Gerar PDF</button>
+        </div>
     </div>
+</header>
 
-</div>
+<main class="container">
+    <!-- Identificação Simplificada -->
+    <section class="card info-aluno">
+        <h3>Identificação da Solicitação</h3>
+        <div class="single-input-grid">
+            <div class="field">
+                <label>Número do Processo SEI</label>
+                <input type="text" id="alunoSEI" placeholder="23108.XXXXXX/XXXX-XX" oninput="salvarInfoAdicional()">
+            </div>
+        </div>
+    </section>
 
-<button onclick="addDisciplina()">Adicionar outra solicitação</button>
-<button onclick="gerarPDF()">Gerar PDF</button>
+    <!-- Instruções Originais Preservadas -->
+    <section class="card instrucoes">
+        <p class="aviso-texto">
+            <strong>Informações Importantes:</strong><br><br>
+            • Disciplinas fora da FAENG devem ser solicitadas por meio do Protocolo Virtual do Aluno, durante o período de ajuste do coordenador, desde que o discente possua os pré-requisitos.<br>
+            • Para turmas de outros cursos da FAENG, a disponibilidade de vagas estará sujeita à autorização do coordenador da disciplina.<br>
+            • A matrícula será realizada após o período de ajuste do coordenador. <br>
+            • As solicitações de quebra de pré-requisito não geram matrícula automática, estando sujeitas à disponibilidade de vagas e à classificação pelo coeficiente de rendimento.<br>
+            • Disciplinas do primeiro semestre não possuem pré-requisitos e não podem ser solicitadas.<br><br>
+
+            <strong>ATENÇÃO:</strong><br>
+            • <strong>MARQUE APENAS</strong> os pré-requisitos que você <strong>JÁ CURSOU</strong>.<br>
+            • <strong>SE NÃO CURSOU, NÃO MARQUE</strong>.<br>
+            • Informe a nota exatamente como está no histórico.<br>
+        </p>
+    </section>
+
+    <!-- Container de Solicitações -->
+    <div id="disciplinas-container"></div>
+
+    <div class="form-footer">
+        <button onclick="addDisciplina()" class="btn-add">+ Adicionar outra solicitação</button>
+        <button onclick="limparFormulario()" class="btn-reset">Limpar formulário</button>
+    </div>
+</main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="script.js"></script>
-
 </body>
 </html>
-
