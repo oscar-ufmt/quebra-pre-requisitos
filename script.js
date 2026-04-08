@@ -37,8 +37,12 @@ function atualizarPrerequisitos(event) {
 
     if (disciplina && disciplina.prerequisitos?.length > 0) {
 
-        disciplina.prerequisitos.forEach(cod => {
+        // 🔹 título
+        const titulo = document.createElement("p");
+        titulo.innerHTML = "<strong>Lista de pré-requisitos:</strong>";
+        container.appendChild(titulo);
 
+        disciplina.prerequisitos.forEach(cod => {
             const prereq = disciplinasData.find(d =>
                 String(d.codigo).trim() === String(cod).trim()
             );
@@ -121,8 +125,18 @@ function gerarPDF() {
         const nome = d.querySelector(".disciplina-quebrada").selectedOptions[0]?.text || "-";
         const turma = d.querySelector(".turma").value || "-";
 
-        doc.text(`Solicitação ${i + 1}`, 10, y); y += 6;
-        doc.text(`Disciplina: ${nome}`, 10, y); y += 6;
+        // 🔹 título menor e em negrito
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.text(`Solicitação ${i + 1}`, 10, y);
+        y += 6;
+
+        // 🔹 texto normal menor
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+
+        doc.text(`Disciplina: ${nome}`, 10, y);
+        y += 6;
 
         const prereqs = d.querySelectorAll(".prereq-item");
 
@@ -134,7 +148,7 @@ function gerarPDF() {
         prereqs.forEach(pr => {
 
             const chk = pr.querySelector("input[type=checkbox]");
-            const nota = pr.querySelector("input[type=text]");
+            const notaInput = pr.querySelector("input[type=text]");
             const label = pr.querySelector("label");
 
             if (chk && label) {
@@ -142,7 +156,23 @@ function gerarPDF() {
                 let texto;
 
                 if (chk.checked) {
-                    texto = `${label.textContent} - Cursada (${nota?.value || "-"})`;
+
+                    let nota = notaInput?.value || "";
+
+                    // 🔹 formatação 3 → 3,00
+                    if (nota !== "") {
+                        nota = parseFloat(nota.replace(",", "."));
+                        if (!isNaN(nota)) {
+                            nota = nota.toFixed(2).replace(".", ",");
+                        } else {
+                            nota = "-";
+                        }
+                    } else {
+                        nota = "-";
+                    }
+
+                    texto = `${label.textContent} - Cursada (${nota})`;
+
                 } else {
                     texto = `${label.textContent} - NÃO cursada`;
                 }
