@@ -47,7 +47,7 @@
     "codigo": "114300006",
     "nome": "Álgebra Linear",
     "carga_horaria": "64h",
-    "prerequisitos": ["114300004"]
+    "prerequisitos": []
   },
    {
     "codigo": "114300024",
