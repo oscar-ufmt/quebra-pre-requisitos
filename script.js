@@ -76,6 +76,7 @@ function atualizarPrerequisitos(select, id) {
         subheader.innerHTML = "<span>Pré-requisito que você deseja quebrar</span><span>Nota</span>";
         container.appendChild(subheader);
 
+
         disciplina.prerequisitos.forEach(codPre => {
             const preObj = disciplinasData.find(d => String(d.codigo) === String(codPre));
             if (!preObj) return;
