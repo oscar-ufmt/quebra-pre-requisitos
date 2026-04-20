@@ -42,7 +42,7 @@ function addDisciplina() {
         </div>
         
         <div class="form-group">
-            <label>Disciplina a ser quebrada:</label>
+            <label>Disciplina que você deseja cursar:</label>
             <select class="select-disciplina" onchange="atualizarPrerequisitos(this, '${id}')">
                 <option value="">Selecione...</option>
                 ${disciplinasData.map(d => `<option value="${d.codigo}">${d.codigo} - ${d.nome}</option>`).join('')}
@@ -73,7 +73,7 @@ function atualizarPrerequisitos(select, id) {
     if (disciplina && disciplina.prerequisitos?.length > 0) {
         const subheader = document.createElement("div");
         subheader.className = "prereq-header-row";
-        subheader.innerHTML = "<span>Pré-requisito</span><span>Nota</span>";
+        subheader.innerHTML = "<span>Pré-requisito que você deseja quebrar</span><span>Nota</span>";
         container.appendChild(subheader);
 
         disciplina.prerequisitos.forEach(codPre => {
